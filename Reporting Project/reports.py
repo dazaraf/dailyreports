@@ -19,32 +19,65 @@ cursor = db.cursor()
 
 print ''
 ##this function 
-def generateReportFromPositionHist(positionsIndicatorsList = [], * args):
+def generateReportFromPositionHist(strat, positionsIndicatorsList = [], * args):
     
-    d = []
-    for indicator in positionsIndicatorsList:
+    listOfDf = []
     
-        indicatorString = indicator
-        query = ''' select indicators.date from research.indicators where indicators.Name = 'nadav'  and indicators.''' + indicator + ''' is null  and  
-        indicators.date in (select positionshist.date  from mayan.positionshist where positionshist.portfolio = 'U1320135' group by positionshist.date)'''
-        cursor.execute(query)
-        indicator = cursor.fetchall()
-        indicator = [x[0] for x in indicator]
-        indicator = pd.DataFrame(indicator, columns = ['Date'])
-        indicator[1] = "%s" %indicatorString
-        indicator = indicator.set_index('Date', drop = False)
-        d.append(indicator)
+    if strat == 'nadav':
         
-    dfinal = reduce(lambda df1, df2: pd.merge(df1, df2, on ='Date'), d)
-    dfinal['Col'] = dfinal.ix[:,1].map(str)
-    for i in range(2,len(d) + 1):
-        dfinal['Col'] = dfinal['Col'].map(str) + ' ,' + dfinal.ix[:,i]
+        for indicator in positionsIndicatorsList:
+        
+            query = '''select date
+            from research.indicators
+            where indicators.Name = 'nadav'  
+            and indicators.''' + indicator + ''' is null  
+            and indicators.date in
+            (
+             select date
+             from mayan.positionshist where positionshist.ticker not in ('QSP.UN', 'SWY.CVR1',
+            'SWY.CVR2') and  (positionshist.portfolio = 
+                                (Select users.portfolio from mayan.users
+                                where users.tradername =  'nadav') or positionshist.portfolio = 
+                                (Select users.oldPortfolio from mayan.users
+                                 where users.tradername =  'nadav') ) group by date
+                                 )'''
+            cursor.execute(query)
+            ind = cursor.fetchall()
+            ind = [x[0] for x in ind if len(x) !=0]
+            listOfDf.append(ind)
+            listOfDf = [x for x in listOfDf if len(x) !=0]
+            
+
+    else:
     
-    col_index = len(d) + 1
-    dfinal = dfinal.iloc[:,[0,col_index]]
-    dfinal = dfinal.set_index('Date', drop = True)
+        for indicator in positionsIndicatorsList:
+            
+           query = "select date  from research.indicators   where indicators.Name ='" + strat + "'and indicators." + indicator + " is null and indicators.date in (select date   from mayan.positionshist where positionshist.portfolio =   (Select users.portfolio from mayan.users   where users.tradername =  '" + strat + "' ) or positionshist.portfolio = (Select users.oldPortfolio from mayan.users   where users.tradername = '" + strat + "' )  group by date  ) "
+           cursor.execute(query)
+           ind = cursor.fetchall()
+           ind = [x[0] for x in ind if len(x) !=0]
+           dfInd = pd.DataFrame(ind,columns = ['Date'] )
+           dfInd[1] = '%s' %indicator
+           listOfDf.append(dfInd)
+           listOfDf= [x for x in listOfDf if len(x) !=0]
+        
+           
+    if len(listOfDf) == 0:
+        
+        return "All Clear"
     
-    return dfinal
+    else:
+        
+        dfinal = reduce(lambda df1, df2: pd.merge(df1, df2, on ='Date'), listOfDf)
+        dfinal['Col'] = dfinal.ix[:,1].map(str)
+        for i in range(2,len(listOfDf) + 1):
+            dfinal['Col'] = dfinal['Col'].map(str) + ' ,' + dfinal.ix[:,i]
+           
+        col_index = len(listOfDf) + 1
+        dfinal = dfinal.iloc[:,[0,col_index]]
+        dfinal = dfinal.set_index('Date', drop = True)
+    
+        return dfinal
     
     
 
