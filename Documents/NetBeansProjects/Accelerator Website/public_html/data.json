@@ -1,0 +1,56 @@
+[
+  {
+    "lane": 0,
+    "batchName": "Jan2016",
+    "startDate": "2016-01-01",
+    "endDate": "2016-07-01",
+    "startups": [
+      {
+        "startupName": "BitLove",
+        "description": "Randomize your next date and pay using bitcoin"
+      },
+      {
+        "startupName": "Prosper.it",
+        "description": "Create a tailor made financial education with our online videos, excersises and tutorials"
+      },
+      {
+        "startupName": "Pectoral",
+        "description": "Match a gym buddy in your area"
+      }
+    ]
+  },
+  {
+    "lane": 0,
+    "batchName": "July2016",
+    "startDate": "2016-07-31",
+    "endDate": "2016-12-31",
+    "startups": [
+      {
+        "startupName": "Ai-inspired",
+        "description": "Executive training programs on the risks of AI"
+      },
+      {
+        "startupName": "Pre-game",
+        "description": "Connect to Spotify/Apple music profiles and play music that everyone likes"
+      }
+    ]
+
+  },
+  {
+    "lane": 1,
+    "batchName": "July2016",
+    "startDate": "2016-07-31",
+    "endDate": "2016-12-31",
+    "startups": [
+      {
+        "startupName": "Friendly.Ai",
+        "description": "A chatbot that helps kids perfect sentence structure and develop better vocabularly"
+      },
+      {
+        "startupName": "Homely",
+        "description": "Creating a microwave which you can control with a mobile device"
+      }
+    ]
+
+  }
+]
